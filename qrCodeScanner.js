@@ -24,3 +24,38 @@ qrcode.callback = (res) => {
     canvasElement.hidden = true
   }
 }
+
+btnScanQR.onclick = () => {
+    navigator.mediaDevices
+    .getUserMedia({
+      video: {
+        facingMode: "environment"
+      }
+    })
+    .then(function (stream) {
+      scanning = true
+      qrResult.hidden = true
+      btnScanQR.hidden = true
+      canvasElement.hidden = false
+      video.setAttribute("playsinline", true)
+      video.srcObject = stream
+      video.play()
+      tick()
+      scan()
+    })
+  }
+
+  function tick() {
+    canvasElement.height = video.videoHeight
+    canvasElement.width = video.videoWidth
+    canvas.drawImage(video, 0, 0, canvasElement.width, canvasElement.height)
+    scanning && requestAnimationFrame(tick)
+  }
+
+  function scan() {
+    try {
+      qrcode.decode()
+    } catch (e) {
+      setTimeout(scan, 300)
+    }
+  }
